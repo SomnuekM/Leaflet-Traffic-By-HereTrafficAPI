@@ -1,4 +1,4 @@
-### Leaflet Traffic By HereTrafficAPI  
+# Leaflet Traffic By HereTrafficAPI  
 
 ## Jam Factor
 [Here Traffic API](https://developer.here.com/documentation/traffic-api/dev_guide/topics/concepts/flow.html#jam-factor)
