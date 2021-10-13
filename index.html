@@ -52,7 +52,9 @@
 
 
     <script>
-        const apiKEY = 'Your Key';
+        // const apiKEY = 'Your Key';
+        // var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
+
         var startPoint = [13.839921, 100.575401];
         var map = L.map('map', {
             trackResize: true,
@@ -126,9 +128,8 @@
                 lineStringTraffic.removeFrom(map);
             }
 
-
-            $.getJSON(`https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`, (dataJson) => {
-
+            var urlJson = `https://raw.githubusercontent.com/SomnuekM/Leaflet-Traffic-By-HereTrafficAPI/main/demodata/demo.json`;
+            $.getJSON(urlJson, (dataJson) => {
 
                 let dateTime = new Date(dataJson.sourceUpdated);
                 console.log(dateTime)
