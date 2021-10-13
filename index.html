@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta name="theme-color" content="#1A233A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="author" content="somnuek.m124@gmail.com">
+    <meta name="description" content="HereMap Traffic in Leaflet">
+    <link rel="icon" href="img/101-map-1.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href='img/101-map-1.png'>
+    <link rel="shortcut icon" href='img/101-map-1.png' type="image/png">
+
+    <title>HereMap Traffic in Leaflet</title>
+    <!-- 🍂🌎 leaflet.css 🍂🌎 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <!-- 🗺️ style.css 🗺️ -->
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <div class="card-traffic">
+        <span class="text-Traffic">Here Traffic API V7</span>
+        <div class="vl"></div>
+        <span class="text-jamFactor">Fast</span>
+        <div class="square-success"></div>
+        <div class="square-warning"></div>
+        <div class="square-danger"></div>
+        <div class="square-closed"></div>
+        <span class="text-jamFactor">Slow</span>
+        <div class="vl"></div>
+        <label class="switch">
+            <input type="checkbox" id="showPolyline" name="showPolyline" onclick="checkShowPolyline(this)" checked>
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- 🍂🌎 leaflet.js 🍂🌎 -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+
+    <script>
+        const apiKEY = 'Your Key';
+        var startPoint = [13.839921, 100.575401];
+        var map = L.map('map', {
+            trackResize: true,
+        }).setView(startPoint, 14);
+        map.zoomControl.setPosition('bottomright');
+
+        var scaleMap = L.control.scale();
+        scaleMap.addTo(map);
+        var trafficLayer = new L.layerGroup().addTo(map);
+
+        var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            attribution: '&copy;',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        var googleTerrain = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+            attribution: '&copy;',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        var googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '&copy; <a href="https://google.com">Google</a>',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }).addTo(map);
+
+        var DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            minZoom: 2,
+            maxZoom: 20,
+        });
+
+        var baseLayers = {
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Streets': googleStreets,
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Terrain': googleTerrain,
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Hybrid': googleHybrid,
+            '<img src="img/LogoMap/map-location.png" width="28px">&nbsp; DarkMatter': DarkMatter
+        };
+        var overlays = {
+            '<img src="img/113-traffic-light.png" width="30px" height="30px"> traffic': trafficLayer,
+        };
+
+        L.control.layers(baseLayers, overlays, {
+            collapsed: true,
+            position: 'bottomleft'
+        }).addTo(map);
+
+
+
+        function getColor(jamFactor) {
+            return jamFactor > 10 ? '#961614' :
+                jamFactor > 8 ? '#E71F28' :
+                jamFactor > 5 ? '#FEC802' :
+                '#56B167';
+        };
+
+
+        var lineWeight = 5;
+        var lineStringTraffic;
+        const checkbox = document.getElementById('showPolyline');
+
+        function getDataAPI() {
+
+            if (lineStringTraffic) {
+                lineStringTraffic.removeFrom(map);
+            }
+
+
+            $.getJSON(`https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`, (dataJson) => {
+
+
+                let dateTime = new Date(dataJson.sourceUpdated);
+                console.log(dateTime)
+                var features = [];
+
+
+                dataJson.results.forEach((item) => {
+
+                    item.location.shape.links.forEach((el) => {
+
+                        var lineData = [];
+                        var dataLineString = {
+                            "type": "Feature",
+                            "properties": {
+                                "sourceUpdated": dateTime,
+                                "description": item.location.description,
+                                "length": item.location.length,
+                                "points_length": el.length,
+                                "currentFlow": item.currentFlow
+                            },
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": lineData
+                            }
+                        }
+
+                        el.points.forEach((elPoint) => {
+                            let loc = [elPoint.lon, elPoint.lat]
+                            lineData.push(loc)
+                        });
+
+                        features.push(dataLineString);
+
+                    });
+
+                });
+
+                var geoData = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+
+
+                geoData.features.forEach(function(lineSegment) {
+
+                    segmentCoords = L.GeoJSON.coordsToLatLngs(lineSegment.geometry.coordinates, 0);
+                    segmentWidth = 1 * (lineWeight + 1);
+
+                    lineStringTraffic = L.polyline(segmentCoords, {
+                        color: getColor(lineSegment.properties.currentFlow.jamFactor),
+                        weight: lineWeight,
+                        opacity: 1,
+                        offset: 0 * (lineWeight + 1) - (segmentWidth / 2) + ((lineWeight + 1) / 2),
+                        smoothFactor: 1
+                    }).addTo(trafficLayer);
+                    lineStringTraffic.bindPopup(`<b>${lineSegment.properties.description}</b><br/>
+                                                <p>Point Length:${lineSegment.properties.points_length} M.</p>
+                                                <p>Path Length:${lineSegment.properties.length} M.</p>
+                                                `);
+
+                });
+
+                if (checkbox.checked != false) {
+                    trafficLayer.addTo(map);
+                } else {
+                    trafficLayer.remove();
+                    lineStringTraffic.removeFrom(map);
+                }
+
+                // zoom the map to the polyline
+                // map.fitBounds(trafficLayer.getBounds());
+                // //Add selected points back into map as green circles.
+                // map.addLayer(trafficLayer);
+
+            });
+        }
+        setInterval(getDataAPI, 2000);
+
+        function checkShowPolyline(checkbox) {
+            if (checkbox.checked == true) {
+                trafficLayer.addTo(map);
+            } else if (checkbox.checked == false) {
+                trafficLayer.remove();
+                lineStringTraffic.removeFrom(map);
+            }
+        }
+
+
+        L.circle([13.839921, 100.575401], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.2,
+            radius: 5000
+        }).addTo(map).bindPopup("[13.839921, 100.575401]<br> r = 2000");
+    </script>
+
+</body>
+
+</html>
