@@ -61,7 +61,7 @@
         var map = L.map('map', {
             trackResize: true,
         }).setView(startPoint, 14);
-        map.zoomControl.setPosition('bottomright');
+        map.zoomControl.setPosition('topleft');
 
         var scaleMap = L.control.scale();
         scaleMap.addTo(map);
