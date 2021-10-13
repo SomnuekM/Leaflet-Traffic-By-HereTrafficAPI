@@ -146,3 +146,76 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.cardfix {
+    width: 280px;
+    height: 500px;
+    position: fixed;
+    z-index: 1;
+    top: 40px;
+    right: 20px;
+    transition: 0.5s;
+    padding-top: 60px;
+    padding-left: 10px;
+    padding-top: 0px;
+    padding-right: 10px;
+    background: #fff;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 1px 7px 14px -5px rgba(0, 0, 0, 0.35);
+}
+
+.mini-card {
+    margin-top: 26px;
+    height: 474px;
+    overflow-x: hidden;
+    overflow: scroll;
+}
+
+.mini-card::-webkit-scrollbar {
+    width: 12px;
+    /* width of the entire scrollbar */
+}
+
+.mini-card::-webkit-scrollbar-track {
+    background: rgb(255, 255, 255);
+    /* color of the tracking area */
+}
+
+.mini-card::-webkit-scrollbar-thumb {
+    scrollbar-color: #d4aa70 #e4e4e4;
+    /* color of the scroll thumb */
+    border-radius: 20px;
+    /* roundness of the scroll thumb */
+    border: 3px solid rgb(206, 175, 118);
+    /* creates padding around scroll thumb */
+}
+
+.mini-card a {
+    transition: 0.3s;
+}
+
+.mini-card a:hover {
+    color: #e27319;
+}
+
+.mini-card:after {
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.closebtn {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+}
+
+.openbtn {
+    font-size: 30px;
+    cursor: pointer;
+    float: right;
+    padding-top: 10px;
+    padding-right: 10px;
+}

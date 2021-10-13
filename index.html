@@ -28,7 +28,21 @@
 
 <body>
     <div id="map"></div>
-
+    <span class="openbtn" onclick="openNav()"><img src="img/astronaut2.png" width="50px" height="50px"/></span>
+    <div class='cardfix' id="mySidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><img src="img/x-mark.png" width="24px" height="24px" /></a>
+        <div class="mini-card">
+            <b>Speeds</b>
+            <p>A current flow object contains 3 speed values:</p>
+            <p>● freeFlow - the reference speed along the roadway when no traffic is present <br/> ● speed - the expected speed along the roadway; will not exceed the legal speed limit<br/> ● speedUncapped - the expected speed along the roadway; may exceed
+                the legal speed limit<br/>
+            </p>
+            <b>Jam Factor</b>
+            <p>The jamFactor field provides a value for the amount of traffic on the roadway. The value is between 0.0 and 10.0.</p>
+            <p>A value of 0.0 indicates that there is no congestion on the roadway. As the value approaches 10.0, it indicates increasing congestion. A value of 10.0 is reserved to represent a blocked roadway (closure).
+            </p>
+        </div>
+    </div>
     <div class="card-traffic">
         <span class="text-Traffic">Here Traffic</span>
         <div class="vl"></div>
@@ -52,6 +66,20 @@
     <!-- 🍂🌎 leaflet.js 🍂🌎 -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
 
+    <script>
+        //Hide Card
+        closeNav();
+
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "280px";
+            document.getElementById("mySidenav").style.display = "block";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("mySidenav").style.display = "none";
+        }
+    </script>
 
     <script>
         // const apiKEY = 'Your Key';
@@ -208,7 +236,8 @@
 
             });
         }
-        setInterval(getDataAPI, 2000);
+        getDataAPI();
+        // setInterval(getDataAPI, 2000);
 
         function checkShowPolyline(checkbox) {
             if (checkbox.checked == true) {
