@@ -82,8 +82,8 @@
     </script>
 
     <script>
-        // const apiKEY = 'Your Key';
-        // var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
+        const apiKEY = '1h9iV1YGGfVP9dGVVZeLDds5rbkaxdqP0dplT6sjN7Q';
+        var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
 
         var startPoint = [13.839921, 100.575401];
         var map = L.map('map', {
@@ -155,11 +155,18 @@
         function getDataAPI() {
 
             if (lineStringTraffic) {
-                lineStringTraffic.removeFrom(map);
+                lineStringTraffic.removeFrom(trafficLayer);
+                trafficLayer.removeFrom(map);
+                // map.removeLayer(trafficLayer);
+                // map.removeLayer(lineStringTraffic);
+                // trafficLayer.remove(lineStringTraffic);
+                // map.removeLayer(trafficLayer);
+                // map.removeLayer(trafficLayer);
+
             }
 
             var urlJson = `https://raw.githubusercontent.com/SomnuekM/Leaflet-Traffic-By-HereTrafficAPI/main/demodata/demo.json`;
-            $.getJSON(urlJson, (dataJson) => {
+            $.getJSON(url, (dataJson) => {
 
                 let dateTime = new Date(dataJson.sourceUpdated);
                 console.log(dateTime)
@@ -202,7 +209,7 @@
                     "features": features
                 }
 
-
+                console.log(JSON.stringify(geoData, null, 4));
                 geoData.features.forEach(function(lineSegment) {
 
                     segmentCoords = L.GeoJSON.coordsToLatLngs(lineSegment.geometry.coordinates, 0);
@@ -224,9 +231,10 @@
 
                 if (checkbox.checked != false) {
                     trafficLayer.addTo(map);
+                    // map.addLayer(trafficLayer);
                 } else {
-                    trafficLayer.remove();
-                    lineStringTraffic.removeFrom(map);
+                    // trafficLayer.remove();
+                    // lineStringTraffic.removeFrom(map);
                 }
 
                 // zoom the map to the polyline
@@ -236,8 +244,8 @@
 
             });
         }
-        getDataAPI();
-        // setInterval(getDataAPI, 2000);
+        // getDataAPI();
+        setInterval(getDataAPI, 2000);
 
         function checkShowPolyline(checkbox) {
             if (checkbox.checked == true) {
