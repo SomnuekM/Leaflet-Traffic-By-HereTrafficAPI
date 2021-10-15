@@ -88,3 +88,6 @@ $.getJSON(url, (dataJson) => {
 });
 ```
 ![image](https://user-images.githubusercontent.com/58202287/137470517-87567526-2c0f-4199-9b56-37074e931ec5.png)
+
+![image](https://user-images.githubusercontent.com/58202287/137477167-91be19bd-ec8b-4bc0-99dc-16ac896016c3.png)
+
