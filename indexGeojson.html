@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta name="theme-color" content="#1A233A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="author" content="somnuek.m124@gmail.com">
+    <meta name="description" content="HereMap Traffic in Leaflet">
+    <link rel="icon" href="img/101-map-1.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href='img/101-map-1.png'>
+    <link rel="shortcut icon" href='img/101-map-1.png' type="image/png">
+
+    <title>HereMap Traffic in Leaflet</title>
+    <!-- 🍂🌎 leaflet.css 🍂🌎 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <!-- 🗺️ style.css 🗺️ -->
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+
+<body>
+    <div id="map"></div>
+    <span class="openbtn" onclick="openNav()"><img src="img/astronaut2.png" width="50px" height="50px"/></span>
+    <div class='cardfix' id="mySidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><img src="img/x-mark.png" width="24px" height="24px" /></a>
+        <div class="mini-card">
+            <b>Speeds</b>
+            <p>A current flow object contains 3 speed values:</p>
+            <p>● freeFlow - the reference speed along the roadway when no traffic is present <br/> ● speed - the expected speed along the roadway; will not exceed the legal speed limit<br/> ● speedUncapped - the expected speed along the roadway; may exceed
+                the legal speed limit<br/>
+            </p>
+            <b>Jam Factor</b>
+            <p>The jamFactor field provides a value for the amount of traffic on the roadway. The value is between 0.0 and 10.0.</p>
+            <p>A value of 0.0 indicates that there is no congestion on the roadway. As the value approaches 10.0, it indicates increasing congestion. A value of 10.0 is reserved to represent a blocked roadway (closure).
+            </p>
+        </div>
+    </div>
+    <div class="card-traffic">
+        <span class="text-Traffic">Here Traffic</span>
+        <div class="vl"></div>
+        <span class="text-jamFactor">Fast</span>
+        <div class="square-success"></div>
+        <div class="square-warning"></div>
+        <div class="square-danger"></div>
+        <div class="square-closed"></div>
+        <span class="text-jamFactor">Slow</span>
+        <div class="vl"></div>
+        <div class="text-Traffic">
+            <label class="switch">
+                <input type="checkbox" id="showPolyline" name="showPolyline" onclick="checkShowPolyline(this)" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- 🍂🌎 leaflet.js 🍂🌎 -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+    <script>
+        //Hide Card
+        closeNav();
+
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "280px";
+            document.getElementById("mySidenav").style.display = "block";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("mySidenav").style.display = "none";
+        }
+    </script>
+
+    <script>
+        const apiKEY = '1h9iV1YGGfVP9dGVVZeLDds5rbkaxdqP0dplT6sjN7Q';
+        var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
+
+        var startPoint = [13.839921, 100.575401];
+        var map = L.map('map', {
+            trackResize: true,
+        }).setView(startPoint, 14);
+        map.zoomControl.setPosition('topleft');
+
+        var scaleMap = L.control.scale();
+        scaleMap.addTo(map);
+
+        var trafficLayer = new L.layerGroup().addTo(map);
+        var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            attribution: '&copy;',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        var googleTerrain = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+            attribution: '&copy;',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        var googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '&copy; <a href="https://google.com">Google</a>',
+            minZoom: 2,
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }).addTo(map);
+
+        var DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            minZoom: 2,
+            maxZoom: 20,
+        });
+
+        var baseLayers = {
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Streets': googleStreets,
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Terrain': googleTerrain,
+            '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Hybrid': googleHybrid,
+            '<img src="img/LogoMap/map-location.png" width="28px">&nbsp; DarkMatter': DarkMatter
+        };
+        var overlays = {
+            '<img src="img/113-traffic-light.png" width="30px" height="30px"> traffic': trafficLayer,
+        };
+
+
+        L.control.layers(baseLayers, overlays, {
+            collapsed: true,
+            position: 'bottomleft'
+        }).addTo(map);
+
+
+
+        function getColor(jamFactor) {
+            return jamFactor > 10 ? '#961614' :
+                jamFactor > 8 ? '#E71F28' :
+                jamFactor > 5 ? '#FEC802' :
+                '#56B167';
+        };
+
+        const checkbox = document.getElementById('showPolyline');
+        var lineStringTraffic;
+
+        function getDataAPI() {
+
+            if (lineStringTraffic) {
+                lineStringTraffic.removeFrom(trafficLayer);
+
+            }
+            $.getJSON(url, (dataJson) => {
+
+                let dateTime = new Date(dataJson.sourceUpdated);
+                console.log(dateTime)
+                var features = [];
+
+                dataJson.results.forEach((item) => {
+
+                    item.location.shape.links.forEach((el) => {
+
+                        var lineData = [];
+                        var dataLineString = {
+                            "type": "Feature",
+                            "properties": {
+                                "sourceUpdated": dateTime,
+                                "description": item.location.description,
+                                "length": item.location.length,
+                                "points_length": el.length,
+                                "currentFlow": item.currentFlow
+                            },
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": lineData
+                            }
+                        }
+
+                        el.points.forEach((elPoint) => {
+                            let loc = [elPoint.lon, elPoint.lat]
+                            lineData.push(loc)
+                        });
+
+                        features.push(dataLineString);
+
+                    });
+
+                });
+
+                var geoData = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+
+                var lineWeight = 5,
+                    segmentWidth = 1 * (lineWeight + 1);
+                lineStringTraffic = L.geoJson(geoData.features, {
+                    style: function(feature) {
+                        return {
+                            "color": getColor(feature.properties.currentFlow.jamFactor),
+                            "opacity": 1,
+                            "weight": lineWeight,
+                            "offset": 0 * (lineWeight + 1) - (segmentWidth / 2) + ((lineWeight + 1) / 2),
+                        }
+                    },
+                    onEachFeature: function(feature, layer) {
+                        var popupContent = `<b>${feature.properties.description}</b><br/>
+                                <p>Point Length:${feature.properties.points_length} M.</p>
+                                <p>Path Length:${feature.properties.length} M.</p>
+                                `;
+                        if (feature.properties && feature.properties.popupContent) {
+                            popupContent += feature.properties.popupContent;
+                        }
+                        layer.bindPopup(popupContent);
+
+                    }
+                }).addTo(trafficLayer);
+
+
+            });
+        }
+        getDataAPI()
+        setInterval(getDataAPI, 60 * 1000);
+
+        function checkShowPolyline(checkbox) {
+            if (checkbox.checked == true) {
+                trafficLayer.addTo(map);
+            } else if (checkbox.checked == false) {
+                trafficLayer.remove();
+                lineStringTraffic.removeFrom(map);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
