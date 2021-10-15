@@ -82,7 +82,7 @@
     </script>
 
     <script>
-        const apiKEY = 'YourAPI...';
+        const apiKEY = '';
         var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
 
         var startPoint = [13.839921, 100.575401];
@@ -150,14 +150,13 @@
         const checkbox = document.getElementById('showPolyline');
         var lineStringTraffic;
 
-        async function getDataAPI() {
+        function getDataAPI() {
 
             if (lineStringTraffic) {
-                lineStringTraffic.removeFrom(trafficLayer);
-
+                removeLayerLinestring();
             }
 
-            await $.getJSON(url, (dataJson) => {
+            $.getJSON(url, (dataJson) => {
 
                 let dateTime = new Date(dataJson.sourceUpdated);
                 console.log(dateTime)
@@ -199,6 +198,7 @@
                     "type": "FeatureCollection",
                     "features": features
                 }
+                console.log(JSON.stringify(geoData, null, 4));
 
                 var lineWeight = 5,
                     segmentWidth = 1 * (lineWeight + 1);
@@ -228,6 +228,12 @@
         }
         getDataAPI()
         setInterval(getDataAPI, 30 * 1000);
+
+        function removeLayerLinestring() {
+            setTimeout(() => {
+                lineStringTraffic.removeFrom(trafficLayer);
+            }, 3000)
+        }
 
         function checkShowPolyline(checkbox) {
             if (checkbox.checked == true) {
