@@ -5,5 +5,5 @@
 
 [Demo](https://somnuekm.github.io/Leaflet-Traffic-By-HereTrafficAPI/indexGeojson.html)
 
-![image](https://user-images.githubusercontent.com/58202287/137138208-22e4dc55-b17f-4f6d-adca-de56b0aaeb06.png)
+![image](https://user-images.githubusercontent.com/58202287/137466490-6fe49d82-cf28-49bf-bd80-83fbad45f486.png)
 
