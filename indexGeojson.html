@@ -96,6 +96,8 @@
         scaleMap.addTo(map);
 
         var trafficLayer = new L.layerGroup().addTo(map);
+        var radiusYourIn = new L.layerGroup();
+
         var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             attribution: '&copy;',
             minZoom: 2,
@@ -131,7 +133,8 @@
             '<img src="img/LogoMap/map-location.png" width="28px">&nbsp; DarkMatter': DarkMatter
         };
         var overlays = {
-            '<img src="img/113-traffic-light.png" width="30px" height="30px"> traffic': trafficLayer,
+            '<img src="img/113-traffic-light.png" width="30px" height="30px"> Traffic': trafficLayer,
+            '<img src="img/radius.png" width="30px" height="30px"> Circle': radiusYourIn
         };
 
 
@@ -233,7 +236,7 @@
         function removeLayerLinestring() {
             setTimeout(() => {
                 lineStringTraffic.removeFrom(trafficLayer);
-            }, 3000)
+            }, 3500)
         }
 
         function checkShowPolyline(checkbox) {
@@ -245,6 +248,17 @@
                 trafficLayer.remove();
             }
         }
+
+
+        L.circle([13.839921, 100.575401], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.2,
+            radius: 5000
+        }).addTo(radiusYourIn).bindPopup("[13.839921, 100.575401]<br> Radius = 2000");
+
+        let marker = L.marker([13.839921, 100.575401]).addTo(map)
+        marker.bindPopup("<b>Your Are Here</b>").openPopup();
     </script>
 
 </body>
