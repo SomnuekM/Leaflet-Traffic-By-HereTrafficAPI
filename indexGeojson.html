@@ -82,7 +82,7 @@
     </script>
 
     <script>
-        const apiKEY = '1h9iV1YGGfVP9dGVVZeLDds5rbkaxdqP0dplT6sjN7Q';
+        const apiKEY = 'YourAPI';
         var url = `https://tramdev.ino.nectec.or.th/nstdatram/examples/HereMap/getAPI.php?key=${apiKEY}&radius=2000`
 
         var startPoint = [13.839921, 100.575401];
@@ -140,7 +140,6 @@
         }).addTo(map);
 
 
-
         function getColor(jamFactor) {
             return jamFactor > 10 ? '#961614' :
                 jamFactor > 8 ? '#E71F28' :
@@ -151,17 +150,19 @@
         const checkbox = document.getElementById('showPolyline');
         var lineStringTraffic;
 
-        function getDataAPI() {
+        async function getDataAPI() {
 
             if (lineStringTraffic) {
                 lineStringTraffic.removeFrom(trafficLayer);
 
             }
-            $.getJSON(url, (dataJson) => {
+
+            await $.getJSON(url, (dataJson) => {
 
                 let dateTime = new Date(dataJson.sourceUpdated);
                 console.log(dateTime)
                 var features = [];
+
 
                 dataJson.results.forEach((item) => {
 
@@ -223,18 +224,18 @@
                     }
                 }).addTo(trafficLayer);
 
-
             });
         }
         getDataAPI()
-        setInterval(getDataAPI, 60 * 1000);
+        setInterval(getDataAPI, 30 * 1000);
 
         function checkShowPolyline(checkbox) {
             if (checkbox.checked == true) {
+                lineStringTraffic.addTo(trafficLayer);
                 trafficLayer.addTo(map);
             } else if (checkbox.checked == false) {
+                lineStringTraffic.removeFrom(trafficLayer);
                 trafficLayer.remove();
-                lineStringTraffic.removeFrom(map);
             }
         }
     </script>
