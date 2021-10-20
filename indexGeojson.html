@@ -125,11 +125,23 @@
             maxZoom: 20,
         });
 
+        var CyclOSM = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+            maxZoom: 20,
+            attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        
+        var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        
         var baseLayers = {
             '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Streets': googleStreets,
             '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Terrain': googleTerrain,
             '<img src="img/LogoMap/GoogleMap_Logo.png" width="30px"> Google Hybrid': googleHybrid,
-            '<img src="img/LogoMap/map-location.png" width="28px">&nbsp; DarkMatter': DarkMatter
+            '<img src="img/LogoMap/map-location.png" width="28px">&nbsp; DarkMatter': DarkMatter,
+            '<img src="img/LogoMap/osm_logo.svg" width="28px"> CyclOSM': CyclOSM,
+            '<img src="img/LogoMap/osm_logo.svg" width="28px"> CyclOSM OpenStreetMap_DE': OpenStreetMap_DE
         };
         var overlays = {
             '<img src="img/113-traffic-light.png" width="30px" height="30px"> Traffic': trafficLayer,
